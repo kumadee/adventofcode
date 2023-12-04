@@ -1,19 +1,6 @@
 use std::collections::HashMap;
 
-fn line_to_number(line: &str) -> u32 {
-    let nums: HashMap<String, u32> = [
-        (String::from("one"), 1),
-        (String::from("two"), 2),
-        (String::from("three"), 3),
-        (String::from("four"), 4),
-        (String::from("five"), 5),
-        (String::from("six"), 6),
-        (String::from("seven"), 7),
-        (String::from("eight"), 8),
-        (String::from("nine"), 9),
-    ]
-    .into();
-
+fn line_to_number(line: &str, nums: &HashMap<String, u32>) -> u32 {
     let mut first_digit: u32 = 0;
     let mut second_digit: u32 = 0;
     let mut spelled_digit: String = String::from("");
@@ -28,6 +15,14 @@ fn line_to_number(line: &str) -> u32 {
             }
         } else {
             spelled_digit.push(c);
+            for (i, key) in nums.keys().enumerate() {
+                if spelled_digit.len() <= key.len() && key.contains(&spelled_digit) {
+                    break;
+                }
+                if i == 8 {
+                    spelled_digit = String::from(c);
+                }
+            }
             if let Some(digit) = nums.get(&spelled_digit) {
                 if first_digit == 0 && second_digit == 0 {
                     first_digit = *digit;
@@ -35,15 +30,38 @@ fn line_to_number(line: &str) -> u32 {
                 } else {
                     second_digit = *digit;
                 }
-                spelled_digit = String::from("");
+
+                spelled_digit = match c {
+                    'e' | 'o' | 'n' => String::from(c),
+                    _ => String::from(""),
+                };
             }
         }
     }
-    first_digit * 10 + second_digit
+    let res = first_digit * 10 + second_digit;
+    println!("{} = {}", line, res);
+    res
+}
+
+fn get_nums() -> HashMap<String, u32> {
+    [
+        (String::from("one"), 1),
+        (String::from("two"), 2),
+        (String::from("three"), 3),
+        (String::from("four"), 4),
+        (String::from("five"), 5),
+        (String::from("six"), 6),
+        (String::from("seven"), 7),
+        (String::from("eight"), 8),
+        (String::from("nine"), 9),
+    ]
+    .into()
 }
 
 pub fn solve(text: &str) -> u32 {
-    text.lines().map(|line| line_to_number(line)).sum()
+    text.lines()
+        .map(|line| line_to_number(line.trim_start(), &get_nums()))
+        .sum()
 }
 
 #[cfg(test)]
@@ -51,9 +69,11 @@ mod tests {
     use super::*;
     #[test]
     fn test_single_line() {
-        assert_eq!(29, line_to_number("two1nine"));
-        assert_eq!(13, line_to_number("abcone2threexyz"));
-        assert_eq!(76, line_to_number("7pqrstsixteen"));
+        let nums: HashMap<String, u32> = get_nums();
+        assert_eq!(29, line_to_number("two1nine", &nums));
+        assert_eq!(13, line_to_number("abcone2threexyz", &nums));
+        assert_eq!(76, line_to_number("7pqrstsixteen", &nums));
+        assert_eq!(51, line_to_number("fivezg8jmf6hrxnhgxxttwoneg", &nums));
     }
 
     #[test]
@@ -65,6 +85,6 @@ mod tests {
         4nineeightseven2
         zoneight234
         7pqrstsixteen";
-        assert_eq!(142, solve(input));
+        assert_eq!(281, solve(input));
     }
 }

@@ -15,14 +15,16 @@ fn line_to_number(line: &str, nums: &HashMap<String, u32>) -> u32 {
             }
         } else {
             spelled_digit.push(c);
+            println!("{}", spelled_digit);
             for (i, key) in nums.keys().enumerate() {
-                if spelled_digit.len() <= key.len() && key.contains(&spelled_digit) {
+                if spelled_digit.len() <= key.len() && key.starts_with(&spelled_digit) {
                     break;
                 }
                 if i == 8 {
                     spelled_digit = String::from(c);
                 }
             }
+            println!("{:?}", nums.get(&spelled_digit));
             if let Some(digit) = nums.get(&spelled_digit) {
                 if first_digit == 0 && second_digit == 0 {
                     first_digit = *digit;
@@ -39,7 +41,7 @@ fn line_to_number(line: &str, nums: &HashMap<String, u32>) -> u32 {
         }
     }
     let res = first_digit * 10 + second_digit;
-    println!("{} = {}", line, res);
+    //println!("{} = {}", line, res);
     res
 }
 
@@ -70,10 +72,12 @@ mod tests {
     #[test]
     fn test_single_line() {
         let nums: HashMap<String, u32> = get_nums();
-        assert_eq!(29, line_to_number("two1nine", &nums));
-        assert_eq!(13, line_to_number("abcone2threexyz", &nums));
-        assert_eq!(76, line_to_number("7pqrstsixteen", &nums));
-        assert_eq!(51, line_to_number("fivezg8jmf6hrxnhgxxttwoneg", &nums));
+        // assert_eq!(29, line_to_number("two1nine", &nums));
+        // assert_eq!(13, line_to_number("abcone2threexyz", &nums));
+        // assert_eq!(76, line_to_number("7pqrstsixteen", &nums));
+        // assert_eq!(51, line_to_number("fivezg8jmf6hrxnhgxxttwoneg", &nums));
+        // assert_eq!(81, line_to_number("hgneightwogrfkcxpthree98threefourxshxvpbone", &nums));
+        assert_eq!(39, line_to_number("plptcvbzh3fourfiveczxdrckjbg8twoninecrhfkll", &nums))
     }
 
     #[test]

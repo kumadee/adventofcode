@@ -32,7 +32,7 @@ fn line_to_number(line: &str, nums: &HashMap<String, u32>) -> u32 {
                 }
 
                 spelled_digit = match c {
-                    'e' | 'o' | 'n' => String::from(c),
+                    'e' | 'o' | 'n' | 't' => String::from(c),
                     _ => String::from(""),
                 };
             }

@@ -88,7 +88,6 @@ impl Matrix {
         //         }
         //     }
         // }
-
         false
     }
 }
@@ -113,39 +112,42 @@ impl EngineSchematic {
         for i in 0..rows {
             let mut part_num: u32 = 0;
             let mut has_valid_neighbour = false;
-            let mut invalids: Vec<u32> = Vec::new();
-            let mut valids: Vec<u32> = Vec::new();
+            // let mut invalids: Vec<u32> = Vec::new();
+            // let mut valids: Vec<u32> = Vec::new();
             for j in 0..cols {
                 let ch: char = self.matrix.data[i][j];
-                if ch.is_digit(10) {
+                let is_digit = ch.is_digit(10);
+                if is_digit {
                     part_num = part_num * 10 + ch.to_digit(10).unwrap();
                     // check if any of the neighbours is a valid symbol
                     if !has_valid_neighbour {
                         has_valid_neighbour = self.matrix.has_any_valid_neighbour(i, j);
                     }
-                } else {
+                }
+                // if no longer a digit or last element on the line
+                if !is_digit || j+1 == cols {
                     // if num has any valid symbol as neighbours
                     // save it in the schematic part vector
                     if part_num > 0 && has_valid_neighbour {
                         self.parts.push(part_num);
-                        valids.push(part_num);
+                        // valids.push(part_num);
                     }
-                    if part_num > 0 && !has_valid_neighbour {
-                        invalids.push(part_num);
-                    }
+                    // if part_num > 0 && !has_valid_neighbour {
+                    //     invalids.push(part_num);
+                    // }
                     has_valid_neighbour = false;
                     part_num = 0;
                 }
             }
-            if invalids.len() > 0 {
-                println!("line {}, invalids {:?}", i + 1, invalids);
-            }
-            println!(
-                "line {}, valids {:?}, sum {}",
-                i + 1,
-                valids,
-                (&valids).into_iter().sum::<u32>()
-            );
+            // if invalids.len() > 0 {
+            //     println!("line {}, invalids {:?}", i + 1, invalids);
+            // }
+            // println!(
+            //     "line {}, valids {:?}, sum {}",
+            //     i + 1,
+            //     valids,
+            //     (&valids).into_iter().sum::<u32>()
+            // );
         }
     }
 }

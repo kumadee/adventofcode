@@ -1,14 +1,13 @@
-use std::collections::{HashSet, HashMap};
+use std::collections::HashSet;
 
 pub fn solve(input: &str) -> u32 {
-    let mut scratchcards: HashMap<usize, u32> = HashMap::new();
     let total_card_num = input.lines().count();
+    let mut scratchcards: Vec<u32> = vec![0; total_card_num];
     for (card_num, line) in input.lines().enumerate() {
         let colon_idx = match line.find(":") {
             Some(c) => c,
             None => 0,
         };
-        println!("{}", line.trim());
         let pipe_idx = match line.find("|") {
             Some(c) => c,
             None => 0,
@@ -19,23 +18,48 @@ pub fn solve(input: &str) -> u32 {
             .map(|d| d.parse::<u32>().unwrap_or_default())
             .filter(|d| *d != 0)
             .collect();
-        println!("{:?}", scratchcard_nums);
         let nums_in_hand: HashSet<u32> = line[pipe_idx..]
             .trim()
             .split_whitespace()
             .map(|d| d.parse::<u32>().unwrap_or_default())
             .collect();
-        println!("{:?}", nums_in_hand);
         let nums = scratchcard_nums
             .intersection(&nums_in_hand)
             .collect::<Vec<&u32>>();
-        println!("{:?}", nums);
+
         if nums.len() > 0 {
-            let point: u32 = 2_u32.pow(nums.len() as u32 - 1);
-            scratchcards.push(point);
+            scratchcards[card_num] = nums.len().try_into().unwrap_or_default();
         }
     }
-    scratchcards.into_values().sum()
+    calc_total_scratchcards(&scratchcards)
+}
+
+// 1 -> 4 -> 1 + 0 = done
+// 2 -> 2 -> 1 + 1 + 0 = done
+// 3 -> 2 -> 1 + 1 + 2 + 0 = done
+// 4 -> 1 -> 1 + 1 + 2 + 4 + 0 = done
+// 5 -> 0 -> 1 + 1 + 4 + 8 + 0 = done
+// 6 -> 0 -> 1 + 0 = done
+// 1 + 2 + 4 + 8 + 14 + 1 = 30
+fn calc_total_scratchcards(points: &Vec<u32>) -> u32 {
+    let count = points.len();
+    let mut card_count = vec![1_u32; count];
+    for (i, p) in points.into_iter().enumerate() {
+        // println!("card {}, count: {}", i + 1, card_count[i]);
+        if i + 1 >= count {
+            break;
+        }
+        let mut j: usize = i + <u32 as TryInto<usize>>::try_into(*p).unwrap();
+        if j > count {
+            j = count - 1;
+        }
+        for x in i + 1..=j {
+            card_count[x] += card_count[i];
+            // println!("=> card {}, count: {}", x + 1, card_count[x]);
+        }
+    }
+    // println!("card_count: {:?}", card_count);
+    card_count.into_iter().sum()
 }
 
 #[cfg(test)]
@@ -51,6 +75,6 @@ mod tests {
         Card 5: 87 83 26 28 32 | 88 30 70 12 93 22 82 36
         Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11";
 
-        assert_eq!(13, solve(input));
+        assert_eq!(30, solve(input));
     }
 }

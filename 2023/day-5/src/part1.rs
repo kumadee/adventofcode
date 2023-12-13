@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 
 type MyMap = Vec<Data>;
 
@@ -18,6 +17,16 @@ fn get(my_map: &MyMap, src_key: u64) -> Option<u64> {
     None
 }
 
+fn insert(my_map: &mut MyMap, line: &str) {
+    let iter = line.splitn(3, ' ').map(|d| d.parse::<u64>());
+    let dest = match iter.next() {
+        Some(x) => x.unwrap_or_default(),
+        None => 0,
+    };
+    let (dest, src, length) = (0, 0, 0);
+    my_map.push(Data { dest, src, length });
+}
+
 pub fn solve(input: &str) -> u64 {
     let seed_to_soil: MyMap = Vec::new();
     let soil_to_fertilizer: MyMap = Vec::new();
@@ -31,14 +40,12 @@ pub fn solve(input: &str) -> u64 {
     for line in input.lines() {
         if line.starts_with("seeds:") {
             seeds = line[6..]
-            .split_whitespace()
-            .map(|d| d.parse::<u64>().unwrap_or_default())
-            .collect();
+                .split_whitespace()
+                .map(|d| d.parse::<u64>().unwrap_or_default())
+                .collect();
         }
 
-        if line.starts_with("seed-to-soil map:") {
-
-        }
+        if line.starts_with("seed-to-soil map:") {}
     }
 
     0

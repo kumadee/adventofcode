@@ -1,37 +1,42 @@
 def solve(data: list[str]) -> int:
-    dail = [i for i in range(100)]
-    current_pos = 50
-    count_zeros = 0
+    dial_size = 100
+    position = 50
+    zero_count = 0
 
-    for turn in data:
-        turn = turn.strip()
-        position = turn[0]
-        move_by = int(turn[1:])
-        # print(f"Old Current position: {current_pos}, turn: {turn}")
-        if move_by >= len(dail):
-            complete_rotations = move_by // len(dail)
-            move_by = move_by % len(dail)
-            count_zeros += complete_rotations
-            # print("pointed to zero due to complete rotations")
-            if move_by == 0 and current_pos == 0:
-                continue
-        match position:
-            case "L":
-                if current_pos != 0 and current_pos - move_by < 0:
-                    # print("pointed to zero due to going less than zero")
-                    count_zeros += 1
-                current_pos = dail[current_pos - move_by]
-            case "R":
-                current_pos = current_pos + move_by
-                if current_pos >= len(dail):
-                    current_pos = dail[current_pos - len(dail)]
-                    if current_pos != 0:
-                        count_zeros += 1
-                        # print("pointed to zero due to going more than 99")
-            case _:
-                raise ValueError(f"unexpected position value: {position}")
-        if current_pos == 0:
-            count_zeros += 1
-        # print(f"New Current position: {current_pos}, count_zeros: {count_zeros}")
+    for move in data:
+        move = move.strip()
+        if not move or len(move) < 2:
+            raise ValueError(f"Invalid move instruction: {move}")
 
-    return count_zeros
+        direction = move[0]
+        try:
+            steps = int(move[1:])
+        except ValueError:
+            raise ValueError(f"Invalid step value in move: {move}")
+
+        full_rotations, steps = divmod(steps, dial_size)
+        zero_count += full_rotations
+
+        if position == 0 and steps == 0:
+            continue
+
+        old_position = position
+        if direction == "L":
+            new_position = (position - steps) % dial_size
+            if old_position > new_position:
+                # Crossed zero
+                zero_count += 1
+            position = new_position
+        elif direction == "R":
+            new_position = (position + steps) % dial_size
+            if new_position < old_position:
+                # Crossed zero
+                zero_count += 1
+            position = new_position
+        else:
+            raise ValueError(f"Unexpected direction value: {direction}")
+
+        if position == 0:
+            zero_count += 1
+
+    return zero_count

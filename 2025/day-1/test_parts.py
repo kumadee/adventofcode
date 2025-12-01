@@ -37,3 +37,10 @@ def test_part2():
     test_input = cast(List[str], test_input)
     expected_output = 8
     assert part2.solve(test_input) == expected_output
+
+
+def test_solve_complete_input():
+    with open("input.txt") as f:
+        input_data = f.read().strip().splitlines()
+    assert part1.solve(input_data) == 1129
+    assert part2.solve(input_data) == 6638

@@ -1,26 +1,29 @@
 def solve(data: list[str]) -> int:
-    dail = [i for i in range(100)]
-    current_pos = 50
-    count_zeros = 0
+    dial_size = 100
+    position = 50
+    zero_count = 0
 
-    for turn in data:
-        turn = turn.strip()
-        position = turn[0]
-        move_by = int(turn[1:])
-        if move_by >= len(dail):
-            move_by = move_by % len(dail)
-        # print(f"Old Current position: {current_pos}, turn: {turn}")
-        match position:
-            case "L":
-                current_pos = dail[current_pos - move_by]
-            case "R":
-                current_pos = current_pos + move_by
-                if current_pos >= len(dail):
-                    current_pos = dail[current_pos - len(dail)]
-            case _:
-                raise ValueError(f"unexpected position value: {position}")
-        # print(f"New Current position: {current_pos}")
-        if current_pos == 0:
-            count_zeros += 1
+    for move in data:
+        move = move.strip()
+        if not move or len(move) < 2:
+            raise ValueError(f"Invalid move instruction: {move}")
 
-    return count_zeros
+        direction = move[0]
+        try:
+            steps = int(move[1:])
+        except ValueError:
+            raise ValueError(f"Invalid step value in move: {move}")
+
+        steps %= dial_size  # Ensure steps are within dial bounds
+
+        if direction == "L":
+            position = (position - steps) % dial_size
+        elif direction == "R":
+            position = (position + steps) % dial_size
+        else:
+            raise ValueError(f"Unexpected direction value: {direction}")
+
+        if position == 0:
+            zero_count += 1
+
+    return zero_count

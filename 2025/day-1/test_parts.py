@@ -21,6 +21,24 @@ def test_part1():
     assert part1.solve(test_input) == expected_output
 
 
+def test_part2_only_left_and_zero_is_not_reached():
+    test_input = """
+        L38
+        L2""".strip().splitlines()
+    test_input = cast(List[str], test_input)
+    expected_output = 0
+    assert part1.solve(test_input) == expected_output
+
+
+def test_part2_only_right_and_zero_is_not_reached():
+    test_input = """
+        R38
+        R2""".strip().splitlines()
+    test_input = cast(List[str], test_input)
+    expected_output = 0
+    assert part1.solve(test_input) == expected_output
+
+
 def test_part2():
     test_input = """
         L68

@@ -1,33 +1,40 @@
-def find_joltage(bank: int) -> int:
-    original_bank = bank
-    battery_size = 12
-    (bank, battery) = divmod(bank, 10**battery_size)
+def find_joltage(bank: str, battery_size: int) -> int:
+    batteries = ""
 
-    batteries = [0 for _ in range(battery_size)]  # least significant digits start first
-    for i in range(battery_size):
-        (battery, batteries[i]) = divmod(battery, 10)
+    frequency = {}
+    for d in bank:
+        if d not in frequency:
+            frequency[d] = 1
+        else:
+            frequency[d] += 1
 
-    while bank != 0:
-        (bank, last_digit) = divmod(bank, 10)
+    ordered_digits = sorted(frequency.keys(), reverse=True)
 
-        for i in range(battery_size - 1, 0, -1):
-            if last_digit < batteries[i]:
+    curr_index = 0
+    for _ in range(battery_size):
+        curr_battery_size = len(batteries)
+        digits_index = {i: bank.find(i, curr_index) for i in ordered_digits}
+        places_to_fill_in_battery = battery_size - curr_battery_size
+        for digit in ordered_digits:
+            digit_index = digits_index[digit]
+            if digit_index == -1:
+                continue
+            # check if the digit_index is at a position such that
+            # the remaining digits after the digit_index in bank is
+            # greater than or equal to remaining places to fill in batteries
+            remaining_digits_from_digit_index = len(bank) - digit_index
+            if places_to_fill_in_battery <= remaining_digits_from_digit_index:
+                batteries += digit
+                curr_index = digit_index + 1
                 break
-            tmp = batteries[i]
-            batteries[i] = last_digit
-            last_digit = tmp
+        for k, v in digits_index.items():
+            if v == -1:
+                ordered_digits.remove(k)
 
-    for battery in batteries:
-        if battery == 0:
-            raise ValueError(
-                f"For bank: {original_bank}, the batteries: {batteries} is invalid"
-            )
-    joltage = 0
-    for i, battery in enumerate(batteries):
-        joltage = battery * 10**i + joltage
-    print(f"bank: {original_bank}, joltage: {joltage}")
+    joltage = int(batteries)
+    # print(f"bank: {bank}, joltage: {joltage:_}")
     return joltage
 
 
-def solve(data: list[str]) -> int:
-    return sum([find_joltage(int(bank)) for bank in data])
+def solve(data: list[str], battery_size: int = 12) -> int:
+    return sum([find_joltage(bank.strip(), battery_size) for bank in data])

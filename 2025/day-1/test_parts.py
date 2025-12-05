@@ -57,8 +57,13 @@ def test_part2():
     assert part2.solve(test_input) == expected_output
 
 
-def test_solve_complete_input():
+def test_solve_complete_input_part1():
     with open("input.txt") as f:
         input_data = f.read().strip().splitlines()
     assert part1.solve(input_data) == 1129
+
+
+def test_solve_complete_input_part2():
+    with open("input.txt") as f:
+        input_data = f.read().strip().splitlines()
     assert part2.solve(input_data) == 6638

@@ -30,10 +30,31 @@ def solve(data: list[str]) -> int:
     fresh_ingredients_ranges = [
         newRange(id_range) for id_range in data[0:blank_line_index]
     ]
-    fresh_ingredient_ids = set()
-    # print(f"fresh_ingredients_ranges: {fresh_ingredients_ranges}")
+    fresh_ingredients_range_dict = {}
     for _range in fresh_ingredients_ranges:
-        for id in range(_range.start_id, _range.end_id + 1):
-            fresh_ingredient_ids.add(id)
+        if _range.start_id in fresh_ingredients_range_dict:
+            r = fresh_ingredients_range_dict[_range.start_id]
+            if _range.end_id <= r.end_id:
+                continue
+            r.end_id = _range.end_id
+        fresh_ingredients_range_dict[_range.start_id] = _range
 
-    return len(fresh_ingredient_ids)
+    fresh_ingredients_start_sorted = sorted(fresh_ingredients_range_dict.keys())
+    prev_range = None
+    fresh_ingredients_count = 0
+    for start_id in fresh_ingredients_start_sorted:
+        curr_range = fresh_ingredients_range_dict[start_id]
+        if prev_range is None:
+            prev_range = curr_range
+            fresh_ingredients_count = curr_range.end_id - curr_range.start_id + 1
+            continue
+        if curr_range.start_id <= prev_range.end_id:
+            curr_range.start_id = prev_range.end_id + 1
+
+        if curr_range.start_id > curr_range.end_id:
+            continue
+        fresh_ingredients_count += curr_range.end_id - curr_range.start_id + 1
+        prev_range = curr_range
+
+    # print(f"fresh_ingredients_ranges: {fresh_ingredients_ranges}")
+    return fresh_ingredients_count

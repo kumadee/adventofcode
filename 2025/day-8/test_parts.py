@@ -31,7 +31,7 @@ def test_part1():
         """.strip().splitlines()
     test_input = cast(List[str], test_input)
     expected_output = 40
-    assert part1.solve(test_input) == expected_output
+    assert part1.solve(test_input, 10) == expected_output
 
 
 @pytest.mark.skip(reason="not implemented yet")

@@ -23,7 +23,12 @@ class Point:
         return hash(f"{self.x},{self.y},{self.z}")
 
 
+@dataclass
 class Edge:
+    p1: Point
+    p2: Point
+    distance: int
+
     def __init__(self, p1: Point, p2: Point) -> None:
         self.p1 = p1
         self.p2 = p2
@@ -31,9 +36,6 @@ class Edge:
 
     def contains(self, p: Point) -> bool:
         return self.p1 == p or self.p2 == p
-
-    def __str__(self) -> str:
-        return f"Edge({self.p1}={self.p2}, distance={self.distance})"
 
 
 @dataclass
@@ -52,6 +54,16 @@ class Circuit:
 
         return (p1_index, p2_index)
 
+    def number_of_boxes(self) -> int:
+        boxes: set[Point] = set()
+        for edge in self.edges:
+            if edge.p1 not in boxes:
+                boxes.add(edge.p1)
+            if edge.p2 not in boxes:
+                boxes.add(edge.p2)
+        print(boxes)
+        return len(boxes)
+
 
 def newPoint(line: str) -> Point:
     positions = line.split(",")
@@ -64,16 +76,25 @@ def solve(data: list[str], connect_pairs: int = -1) -> int:
     if connect_pairs == -1:
         connect_pairs = len(data)
     box_locations = [newPoint(line.strip()) for line in data]
+    print()
+    print(f"Number of box locations: {len(box_locations)}")
     edges: list[Edge] = []
     # calculate distances between each point
     # it is represented as a matrix
-    for i, box1 in enumerate(box_locations[0 : len(box_locations) - 1]):
+    for i, box1 in enumerate(box_locations):
+        if i == len(box_locations) - 1:
+            break
         for box2 in box_locations[i + 1 :]:
             if box1 == box2:
                 continue
             edges.append(Edge(box1, box2))
 
     edges_sorted_by_distance = sorted(edges, key=lambda x: x.distance)
+    print(f"Number of edges: {len(edges)}")
+
+    print("Edges sorted by distance")
+    # for edge in edges_sorted_by_distance:
+    #    print(edge)
 
     circuits: list[Circuit] = []
     for i, edge in enumerate(edges_sorted_by_distance):
@@ -95,10 +116,15 @@ def solve(data: list[str], connect_pairs: int = -1) -> int:
             # add a new circuit
             circuits.append(Circuit(edges=[edge], box_count=2))
 
-    # print(circuits)
+    # print("Circuits")
+    # for circuit in circuits:
+    #    print(circuit)
 
     if len(circuits) < 3:
         raise ValueError(f"Total number of circuits: {circuits} is less than 3")
     size_of_circuits = sorted([c.box_count for c in circuits], reverse=True)
     print(size_of_circuits)
+
+    # size_of_circuits = sorted([c.number_of_boxes() for c in circuits], reverse=True)
+    # print(size_of_circuits)
     return reduce(lambda x, y: x * y, size_of_circuits[0:3])
